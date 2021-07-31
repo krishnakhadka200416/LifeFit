@@ -12,6 +12,8 @@ const Login = ({navigation}) => {
         try {
             const user = await Auth.signIn(userName, password);
             console.log(user)
+            setUsername('')
+            setPassword('')
             navigation.navigate('Home')
         } catch (error) {
             Alert.alert(error.message)

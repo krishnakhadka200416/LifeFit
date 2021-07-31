@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../LoginComponent/Login'
@@ -8,8 +8,13 @@ import Home from '../HomeComponent/Home'
 const Stack = createStackNavigator();
 
 
-const NavContainer = () => {
+const NavContainer = (props) => {
   return (
+    <>
+      <StatusBar
+        backgroundColor="red"
+        barStyle="light-content"
+        />
     <NavigationContainer>
     <Stack.Navigator>
       <Stack.Screen name="Login" component={Login} options = {{headerShown: false}} />
@@ -17,6 +22,7 @@ const NavContainer = () => {
       <Stack.Screen name="Home" component={Home}  options = {{headerShown: false}}  />
     </Stack.Navigator>
     </NavigationContainer>
+    </>
   );
 }
 

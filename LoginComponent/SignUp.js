@@ -119,18 +119,22 @@ const SignUp = ({navigation}) =>{
          secureTextEntry
          onChangeText={nextValue => setPassword(nextValue)}
         />
-         <Input
-         placeholder='First Name'
-         value={firstName}
-         style = {styles.inputBox}
-         onChangeText={nextValue => setFirstName(nextValue)}
-        />
-        <Input
-         placeholder='Last Name'
-         value={lastName}
-         style = {styles.inputBox}
-         onChangeText={nextValue => setLastName(nextValue)}
-        />
+       
+
+          <Input
+          placeholder='First Name'
+          value={firstName}
+          style = {styles.inputBox}
+          onChangeText={nextValue => setFirstName(nextValue)}
+          />
+          <Input
+          placeholder='Last Name'
+          value={lastName}
+          style = {styles.inputBox}
+          onChangeText={nextValue => setLastName(nextValue)}
+          />
+        
+
         <Input
          placeholder='Phone Number'
          value={phoneNumber}
