@@ -67,24 +67,28 @@ const SignUp = () =>{
          style = {styles.inputBox}
          onChangeText={nextValue => setStreetAddress(nextValue)}
         />
+
         <Input
          placeholder='City'
          value={city}
          style = {styles.inputBox}
          onChangeText={nextValue => setCity(nextValue)}
         />
+
         <Input
          placeholder='State'
          value={state}
          style = {styles.inputBox}
          onChangeText={nextValue => setState(nextValue)}
         />
+
         <Input
          placeholder='ZipCode'
          value={zipCode}
          style = {styles.inputBox}
          onChangeText={nextValue => setZipCode(nextValue)}
         />
+        
          <Input
          placeholder='Gender'
          value={gender}
