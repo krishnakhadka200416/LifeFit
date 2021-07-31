@@ -1,10 +1,11 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native'
+import {View, Text, StyleSheet, ScrollView, Modal, Pressable, Alert} from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { Input ,Button, Layout } from '@ui-kitten/components';
+import { Auth } from 'aws-amplify';
 
-const SignUp = () =>{
-    const [userName, setUsername] = React.useState('');
+const SignUp = ({navigation}) =>{
+    const [username, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [firstName, setFirstName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
@@ -15,17 +16,99 @@ const SignUp = () =>{
     const [state, setState] = React.useState('');
     const [zipCode, setZipCode] = React.useState('');
     const [gender, setGender] = React.useState('');
+    const [code, setCode] = React.useState('');
+
+    const [modalVisible, setModalVisible] = React.useState(false);
+
+    async function confirmSignUp() {
+        try {
+          await Auth.confirmSignUp(username, code);
+          setModalVisible(!modalVisible)
+          setUsername('')
+          setPassword('')
+          setFirstName('')
+          setLastName('')
+          setPhoneNumber('')
+          setEmail('')
+          setStreetAddress('')
+          setCity('')
+          setState('')
+          setZipCode('')
+          setGender('')
+          setCode('')
+          navigation.navigate('Home')
+        } catch (error) {
+            Alert.alert("Invalid verification code.")
+            console.log('error confirming sign up', error);
+        }
+    }
+
+    async function signUpUser() {
+        if (username === "" || password === "" || email === "")
+        {
+            console.log("no user")
+        }
+        else
+        {
+            try {
+             
+                const {user} =  await Auth.signUp({
+                    username,
+                    password,
+                    attributes: {
+                        email
+                    }
+    
+                });
+                 setModalVisible(true)
+    
+            } catch (error) {
+                console.log('error signing up:', error);
+            }
+        }
+    }
+
     return (
+      
         <LinearGradient
         colors={['red', 'white']}
         style={styles.container}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         >
+        <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+        Alert.alert("No confirmation code provided.");
+        setModalVisible(!modalVisible);
+        }}
+         >
+            <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Enter Code</Text>
+            <Input
+             placeholder='Code'
+             value={code}
+             style = {styles.inputBox}
+             secureTextEntry
+             onChangeText={nextValue => setCode(nextValue)}
+         />
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={confirmSignUp}
+            >
+              <Text style={styles.textStyle}>Confirm Code</Text>
+            </Pressable>
+          </View>
+        </View>
+
+         </Modal>
         <Text style = {{color:"white", fontSize: 20, fontWeight:"bold"}}>REGISTER</Text>
         <Input
          placeholder='Username'
-         value={userName}
+         value={username}
          style = {styles.inputBox}
          onChangeText={nextValue => setUsername(nextValue)}
         />
@@ -88,7 +171,7 @@ const SignUp = () =>{
          style = {styles.inputBox}
          onChangeText={nextValue => setZipCode(nextValue)}
         />
-        
+
          <Input
          placeholder='Gender'
          value={gender}
@@ -96,7 +179,7 @@ const SignUp = () =>{
          onChangeText={nextValue => setGender(nextValue)}
         />
        
-        <Button style = {{marginTop: 30 , width:120, height : 45}} appearance = "outline" status = 'danger' size= 'medium' >SUBMIT</Button>
+        <Button onPress = {signUpUser} style = {{marginTop: 30 , width:120, height : 45}} appearance = "outline" status = 'danger' size= 'medium' >SUBMIT</Button>
         </LinearGradient>
 
     )
@@ -112,6 +195,37 @@ const styles = StyleSheet.create({
         marginHorizontal:50 ,
         marginTop:10      
     },
+    centeredView: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 22
+      },
+      modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        alignItems: "center",
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+      },
+      textStyle: {
+        color: "black",
+        fontWeight: "bold",
+        textAlign: "center",
+        marginTop:20
+      },
+      modalText: {
+        marginBottom: 15,
+        textAlign: "center"
+      }
 
 })
 
