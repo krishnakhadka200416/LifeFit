@@ -8,22 +8,21 @@
 
 import React from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
-  Text,
-  useColorScheme,
   View,
 } from 'react-native';
+import * as eva from '@eva-design/eva';
+import { ApplicationProvider, Layout, Text } from '@ui-kitten/components';
 
-
+import NavContainer from './NavigatoinContainer/NavContainer'
 const App = () => {
   return (
-    <View style = {styles.container} >
-       
-    </View>
-  )
+    
+    <ApplicationProvider {...eva} theme={eva.light}>
+      <NavContainer/>
+     </ApplicationProvider>
+    
+       )
 }
 
 const styles = StyleSheet.create ( {
