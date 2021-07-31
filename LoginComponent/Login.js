@@ -1,12 +1,23 @@
 import React from 'react';
-import {View, Text, StyleSheet, Image, ImageBackground, TouchableOpacity} from 'react-native'
+import {View, Text, StyleSheet, Image, ImageBackground, TouchableOpacity, Alert} from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import { Input ,Button, Layout } from '@ui-kitten/components';
+import {Auth} from 'aws-amplify';
 
 const Login = ({navigation}) => {
     const [userName, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
   
+    async function signIn() {
+        try {
+            const user = await Auth.signIn(userName, password);
+            console.log(user)
+            navigation.navigate('Home')
+        } catch (error) {
+            Alert.alert(error.message)
+            console.log('error signing in', error);
+        }
+    }
     return (
         <LinearGradient
         colors={['red', 'white']}
@@ -31,7 +42,7 @@ const Login = ({navigation}) => {
          onChangeText={nextValue => setPassword(nextValue)}
         />
         
-        <Button  style = {{marginTop: 30 , width:120, height : 45}} appearance = "outline" status = 'danger' size= 'medium' >
+        <Button onPress = {signIn} style = {{marginTop: 30 , width:120, height : 45}} appearance = "outline" status = 'danger' size= 'medium' >
                 LOGIN
         </Button>
         <View style = {{flexDirection: "row", marginTop:20}}> 

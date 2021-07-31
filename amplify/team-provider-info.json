@@ -11,6 +11,17 @@
       "StackId": "arn:aws:cloudformation:us-east-2:860877260700:stack/amplify-sdlifefitapp-dev-23231/5f4605c0-bd2b-11eb-b789-06de038b1f64",
       "AmplifyAppId": "damh79ldtgx07",
       "AuthTriggerTemplateURL": ""
+    },
+    "categories": {
+      "auth": {
+        "sdlifefitappAuth": {}
+      },
+      "storage": {
+        "sdlifefitapp14014faa": {
+          "bucketName": "mobilebucket",
+          "region": "us-east-2"
+        }
+      }
     }
   }
 }

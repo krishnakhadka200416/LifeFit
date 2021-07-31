@@ -15,6 +15,12 @@ import * as eva from '@eva-design/eva';
 import { ApplicationProvider, Layout, Text } from '@ui-kitten/components';
 
 import NavContainer from './NavigatoinContainer/NavContainer'
+import Amplify, { Auth } from 'aws-amplify';
+import awsmobile from './src/aws-exports';
+import {withAuthenticator} from 'aws-amplify-react-native'
+Amplify.configure(awsmobile);
+
+
 const App = () => {
   return (
     

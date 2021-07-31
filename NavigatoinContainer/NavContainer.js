@@ -4,16 +4,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Login from '../LoginComponent/Login'
 import SignUp from '../LoginComponent/SignUp'
+import Home from '../HomeComponent/Home'
 const Stack = createStackNavigator();
-const Home = () =>{
-    return (
-        <View>
-            <Text>
-                Home
-            </Text>
-        </View>
-    )
-}
+
 
 const NavContainer = () => {
   return (
@@ -21,7 +14,7 @@ const NavContainer = () => {
     <Stack.Navigator>
       <Stack.Screen name="Login" component={Login} options = {{headerShown: false}} />
       <Stack.Screen name="SignUp" component={SignUp} options = {{headerShown: false}} />
-      <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="Home" component={Home}  options = {{headerShown: false}}  />
     </Stack.Navigator>
     </NavigationContainer>
   );
