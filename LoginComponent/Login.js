@@ -5,6 +5,8 @@ import { Input ,Button, Layout } from '@ui-kitten/components';
 import {Auth} from 'aws-amplify';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
+import AntDesign from "react-native-vector-icons/AntDesign";
+
 const USER_KEY = '@user_key'
 
 const Login = ({navigation}) => {
@@ -38,11 +40,13 @@ const Login = ({navigation}) => {
         end={{ x: 1, y: 1 }}
         >
         <Image resizeMode= "contain" style = {{ width:120, height: 120} } source = {require ('../assets/state_farm_logo.png')}></Image>
-        <Text style = {{color: "white", fontSize:25, fontWeight: "bold", marginBottom: 50}}> STATE FARM FIT </Text>
+        <Text style = {{color: "white", fontSize:25, fontWeight: "bold", marginBottom: 5}}> STATE FARM FIT </Text>
+        <Text style = {{color: "white",  fontWeight: "bold", marginBottom: 40}}>Stay Active, Stay Fit</Text>
          <Input
          placeholder='Username'
          value={userName}
          style = {styles.inputBox}
+         accessoryLeft={ <AntDesign name="user" color= "grey" size={20} />}
          onChangeText={nextValue => setUsername(nextValue)}
         />
         <Input
@@ -51,6 +55,7 @@ const Login = ({navigation}) => {
          value={password}
          secureTextEntry 
          style = {styles.inputBox}
+         accessoryLeft={ <AntDesign name="lock" color= "grey" size={20} />}
          onChangeText={nextValue => setPassword(nextValue)}
         />
         
