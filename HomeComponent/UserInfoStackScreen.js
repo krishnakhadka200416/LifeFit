@@ -9,6 +9,7 @@ import CircularProgress from 'react-native-circular-progress-indicator';
 const UserInfo = createStackNavigator();
 
 const HealthScore = () => {
+
     return (
         <LinearGradient
         colors={['red', 'white']}
@@ -17,6 +18,9 @@ const HealthScore = () => {
         end={{ x: 0, y: 0.20 }}
         >
             <View style = {styles.container1}>
+               
+
+                
                 <View style = {{marginLeft: 10, flexDirection: 'row', marginTop:8,   justifyContent: 'space-between'}}>
                
                     <Text style ={{color: "white"}} category ="h4" >
@@ -36,9 +40,8 @@ const HealthScore = () => {
                             radius={40}
                             maxValue={10}
                             initialValue={0}
-                            activeStrokeColor = {"red"}
+                            activeStrokeColor = {7 > 5 ? "green" : "red"}
                             textColor={'black'}
-                          
                             duration={1000}
                             />
                         <Text>Good !</Text>
@@ -53,12 +56,54 @@ const HealthScore = () => {
                     </View>
 
                 </View>
+                
 
             </View>
             <View style = {styles.container2}>
                 <Card style={styles.card} status='danger'>
                     <Text category = "h6" style ={{marginBottom: 8}}>Today</Text>
-                    <Text>Today</Text>
+                    <View style = {{flexDirection:"row", justifyContent:"space-between"}}>
+                        <View style ={{width:70, margin:5, alignItems:"center"}}>
+                            <CircularProgress
+                                value={1500}
+                                radius={35}
+                                maxValue={10000}
+                                initialValue={0}
+                                activeStrokeColor =  {1500 > 5000 ? "green" : "red"}
+                                textColor={'black'}
+                                duration={1000}
+                                />
+                                <Text>Steps</Text>
+                        </View>
+                        <View style ={{width:70, margin:5, alignItems:"center"}}>
+                            <CircularProgress
+                                value={3}
+                                radius={35}
+                                maxValue={5}
+                                initialValue={0}
+                                activeStrokeColor = {3 > 2.5 ? "green" : "red"}
+                                textColor={'black'}
+                                duration={1000}
+                                />
+                                <Text>Miles</Text>
+                        </View>
+                        <View style ={{width:70, margin:5, alignItems:"center"}}>
+                            <CircularProgress
+                                value={800}
+                                radius={35}
+                                maxValue={2000}
+                                initialValue={0}
+                                activeStrokeColor = {  800 > 1000 ? "green" : "red" }
+                                                                     
+                                    
+                                    
+                                textColor={'black'}
+                                duration={1000}
+                                />
+                                <Text>Calories</Text>
+                        </View>
+                    </View>
+
                     
                 </Card>
                 <Card style={styles.card} status='danger'>
