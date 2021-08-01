@@ -1,16 +1,22 @@
 import * as React from 'react';
-import {  View , StyleSheet, Alert, Image, TouchableOpacity, Linking} from 'react-native';
+import {  View , StyleSheet, Alert, Image, TouchableOpacity, Linking, ScrollView} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Text ,Button, Layout, Card } from '@ui-kitten/components';
 import LinearGradient from 'react-native-linear-gradient'
 import CircularProgress from 'react-native-circular-progress-indicator';
+import Foundation from "react-native-vector-icons/Foundation";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 
 const UserInfo = createStackNavigator();
 
 const HealthScore = () => {
 
     return (
+        <ScrollView>
+
+        
         <LinearGradient
         colors={['red', 'white']}
         style={styles.container}
@@ -64,6 +70,8 @@ const HealthScore = () => {
                     <Text category = "h6" style ={{marginBottom: 8}}>Today</Text>
                     <View style = {{flexDirection:"row", justifyContent:"space-between"}}>
                         <View style ={{width:70, margin:5, alignItems:"center"}}>
+                        <TouchableOpacity>
+
                             <CircularProgress
                                 value={1500}
                                 radius={35}
@@ -73,9 +81,15 @@ const HealthScore = () => {
                                 textColor={'black'}
                                 duration={1000}
                                 />
-                                <Text>Steps</Text>
+                                <View style= {{flexDirection:"row", marginTop:5}}>
+                                <Foundation name="foot" color= "grey" size={20} />
+                                <Text>  Steps</Text>
+
+                                </View>
+                        </TouchableOpacity>
                         </View>
                         <View style ={{width:70, margin:5, alignItems:"center"}}>
+                        <TouchableOpacity>
                             <CircularProgress
                                 value={3}
                                 radius={35}
@@ -85,9 +99,17 @@ const HealthScore = () => {
                                 textColor={'black'}
                                 duration={1000}
                                 />
-                                <Text>Miles</Text>
+                                
+
+                                
+                                <View style= {{flexDirection:"row", marginTop:5}}>
+                                <FontAwesome name="map-marker" color= "grey" size={20} />
+                                <Text>  Miles</Text>
+                                </View>
+                                </TouchableOpacity>
                         </View>
                         <View style ={{width:70, margin:5, alignItems:"center"}}>
+                        <TouchableOpacity>
                             <CircularProgress
                                 value={800}
                                 radius={35}
@@ -100,7 +122,12 @@ const HealthScore = () => {
                                 textColor={'black'}
                                 duration={1000}
                                 />
-                                <Text>Calories</Text>
+                                <View style= {{flexDirection:"row", marginTop:5}}>
+                                <FontAwesome5 name="fire" color= "grey" size={20} />
+                                <Text>  Calories</Text>
+                                </View>
+
+                        </TouchableOpacity>
                         </View>
                     </View>
 
@@ -114,14 +141,13 @@ const HealthScore = () => {
                     <Text category = "h6" style ={{marginBottom: 8}}> Sleep </Text>          
 
                 </Card>
-
+                
                 <Card style={styles.card} status='danger' onPress = {()=> {Alert.alert("Pressed")}}>
                     <Text category = "h6" style ={{marginBottom: 8}}>Active</Text>          
-
                 </Card>
-
             </View>
             </LinearGradient>
+            </ScrollView>
     )
 }
 

@@ -3,6 +3,8 @@ import {View, Text, StyleSheet, ScrollView, Modal, Pressable, Alert} from 'react
 import LinearGradient from 'react-native-linear-gradient'
 import { Input ,Button, Layout } from '@ui-kitten/components';
 import { Auth } from 'aws-amplify';
+import { API } from 'aws-amplify';
+import * as mutations from '../graphql/mutations'
 
 const SignUp = ({navigation}) =>{
     const [username, setUsername] = React.useState('');
@@ -20,9 +22,35 @@ const SignUp = ({navigation}) =>{
 
     const [modalVisible, setModalVisible] = React.useState(false);
 
+    const storeData = async () =>{
+          const userData = {
+            id: 12,
+            fName: firstName,
+            lName: lastName,
+            username: username,
+            email: email,
+            phone: phoneNumber,
+            street: streetAddress,
+            city: city,
+            state: state,
+            zipcode: zipCode,
+            gender: gender,
+            age: 0,
+            score: 0
+          }
+          try{
+             await API.graphql({ query: mutations.createUserDetails, variables: {input: userData}});
+            console.log("user added to dynamo db")
+          }
+          catch(err)
+          {
+            console.log(err)
+          }
+    }
     async function confirmSignUp() {
         try {
           await Auth.confirmSignUp(username, code);
+          storeData()
           setModalVisible(!modalVisible)
           setUsername('')
           setPassword('')
@@ -69,13 +97,15 @@ const SignUp = ({navigation}) =>{
     }
 
     return (
-      
+       
+
         <LinearGradient
         colors={['red', 'white']}
         style={styles.container}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         >
+         
         <Modal
         animationType="slide"
         transparent={true}
@@ -85,6 +115,7 @@ const SignUp = ({navigation}) =>{
         setModalVisible(!modalVisible);
         }}
          >
+         
             <View style={styles.centeredView}>
           <View style={styles.modalView}>
             <Text style={styles.modalText}>Enter Code</Text>
@@ -105,7 +136,9 @@ const SignUp = ({navigation}) =>{
         </View>
 
          </Modal>
-        <Text style = {{color:"white", fontSize: 20, fontWeight:"bold"}}>REGISTER</Text>
+         
+       
+        <Text style = {{color:"white", fontSize: 20, fontWeight:"bold", marginBottom:30}}>REGISTER</Text>
         <Input
          placeholder='Username'
          value={username}
@@ -182,10 +215,13 @@ const SignUp = ({navigation}) =>{
          style = {styles.inputBox}
          onChangeText={nextValue => setGender(nextValue)}
         />
+        
+       
        
         <Button onPress = {signUpUser} style = {{marginTop: 30 , width:120, height : 45}} appearance = "outline" status = 'danger' size= 'medium' >SUBMIT</Button>
+        
         </LinearGradient>
-
+       
     )
 }
 
@@ -197,7 +233,8 @@ const styles = StyleSheet.create({
     },
     inputBox: {
         marginHorizontal:50 ,
-        marginTop:10      
+        marginTop:8, 
+        height:40      
     },
     centeredView: {
         flex: 1,
