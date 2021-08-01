@@ -6,21 +6,21 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const UserInfo = createStackNavigator();
 
-const ProfileScreen = () => {
+const HealthScore = () => {
     return (
         <View>
             <Text>
-                Profile Screen
+                Health Score
             </Text>
         </View>
     )
 }
 
-const SyncScreen = () => {
+const Sleep = () => {
     return (
         <View>
             <Text>
-                Profile Screen
+                Sleep Screen
             </Text>
         </View>
     )
@@ -33,8 +33,8 @@ const  ProfileStackScreen = () => {
 
         return (
             <UserInfo.Navigator>
-              <UserInfo.Screen name="Profile" component={ProfileScreen} options = {{headerShown: false}} />
-              <UserInfo.Screen name="FitbitSync" component={SyncScreen} options = {{headerShown: false}} />
+              <UserInfo.Screen name="Profile" component={HealthScore} options = {{headerShown: false}} />
+              <UserInfo.Screen name="Sleep" component={Sleep} options = {{headerShown: false}} />
             </UserInfo.Navigator>
           );
   

@@ -7,13 +7,19 @@ import {Auth} from 'aws-amplify';
 const Login = ({navigation}) => {
     const [userName, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
-  
+    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+    
+    if(isLoggedIn){
+        navigation.replace('Home')
+    }
     async function signIn() {
         try {
             const user = await Auth.signIn(userName, password);
-            console.log(user)
+            console.log(user.username)
+            console.log(Auth.currentUserInfo())
             setUsername('')
             setPassword('')
+            setIsLoggedIn(true)
             navigation.replace('Home')
         } catch (error) {
             Alert.alert(error.message)
