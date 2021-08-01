@@ -14,7 +14,7 @@ const Login = ({navigation}) => {
             console.log(user)
             setUsername('')
             setPassword('')
-            navigation.navigate('Home')
+            navigation.replace('Home')
         } catch (error) {
             Alert.alert(error.message)
             console.log('error signing in', error);

@@ -36,7 +36,7 @@ const SignUp = ({navigation}) =>{
           setZipCode('')
           setGender('')
           setCode('')
-          navigation.navigate('Home')
+          navigation.replace('Home')
         } catch (error) {
             Alert.alert("Invalid verification code.")
             console.log('error confirming sign up', error);

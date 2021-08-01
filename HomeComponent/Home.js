@@ -4,8 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {StatusBar} from 'react-native';
 import UserInfoStackScreen from './UserInfoStackScreen'
 import ProfileStackScreen from './ProfileStackScreen'
-import { NavigationContainer } from '@react-navigation/native';
-
+import AntDesign from "react-native-vector-icons/AntDesign";
 const Tab = createBottomTabNavigator();
 
 
@@ -15,14 +14,33 @@ const Home = (props) => {
          <Tab.Navigator 
          tabBarOptions={{
              activeTintColor: "white",
-             inactiveTintColor: "black",
+             
+             inactiveTintColor: "white",
               style: {
                  backgroundColor: 'red',
                  paddingBottom: 7,
            }
          }}>
-            <Tab.Screen name="Home" component={UserInfoStackScreen} />
-            <Tab.Screen name="Profile" component={ProfileStackScreen}  />
+            <Tab.Screen 
+                name="Home" 
+                component={UserInfoStackScreen} 
+                options = {{
+                    tabBarIcon:() =>(
+                        <AntDesign name="home" color= "white" size={22} />
+                    )
+                    
+                }}
+              
+                />
+            <Tab.Screen 
+                name="Profile" 
+                component={ProfileStackScreen}
+                options = {{
+                    tabBarIcon:() =>(
+                        <AntDesign name="user" color= "white" size={22} />
+                    )
+                    
+                }}  />
         </Tab.Navigator>
         
    
