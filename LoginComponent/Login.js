@@ -3,20 +3,24 @@ import {View, Text, StyleSheet, Image, ImageBackground, TouchableOpacity, Alert}
 import LinearGradient from 'react-native-linear-gradient'
 import { Input ,Button, Layout } from '@ui-kitten/components';
 import {Auth} from 'aws-amplify';
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+const USER_KEY = '@user_key'
 
 const Login = ({navigation}) => {
     const [userName, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [isLoggedIn, setIsLoggedIn] = React.useState(false);
-    
-    if(isLoggedIn){
-        navigation.replace('Home')
-    }
+    const [userData, setUserData] = React.useState('')
+
+  
+   
     async function signIn() {
         try {
             const user = await Auth.signIn(userName, password);
-            console.log(user.username)
-            console.log(Auth.currentUserInfo())
+            console.log(user)
+            setUserData(user)
+            await AsyncStorage.setItem('@username', JSON.stringify(user))
             setUsername('')
             setPassword('')
             setIsLoggedIn(true)
