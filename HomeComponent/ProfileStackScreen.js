@@ -63,6 +63,7 @@ const ProfileScreen = (props) => {
                     <View style = {{width:70, height: 70, backgroundColor:"red", alignItems:"center", justifyContent:"center", borderRadius:35}}>
                         <Text category = "h3" status ="control">{userName[0]}</Text>
                     </View>
+                    <Text style = {{marginTop:10}}>{userName}</Text>
                     
 
                 </View>
