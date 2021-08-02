@@ -8,6 +8,7 @@ import * as mutations from '../graphql/mutations'
 
 const SignUp = ({navigation}) =>{
     const [username, setUsername] = React.useState('');
+    const[userId, setUserId] =  React.useState('a');
     const [password, setPassword] = React.useState('');
     const [firstName, setFirstName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
@@ -22,35 +23,48 @@ const SignUp = ({navigation}) =>{
 
     const [modalVisible, setModalVisible] = React.useState(false);
 
-    const storeData = async () =>{
-          const userData = {
-            id: 12,
-            fName: firstName,
-            lName: lastName,
-            username: username,
-            email: email,
-            phone: phoneNumber,
-            street: streetAddress,
-            city: city,
-            state: state,
-            zipcode: zipCode,
-            gender: gender,
-            age: 0,
-            score: 0
-          }
-          try{
-             await API.graphql({ query: mutations.createUserDetails, variables: {input: userData}});
-            console.log("user added to dynamo db")
-          }
-          catch(err)
-          {
-            console.log(err)
-          }
-    }
+    
     async function confirmSignUp() {
         try {
           await Auth.confirmSignUp(username, code);
-          storeData()
+          
+            const user = await Auth.signIn(username,password)
+             
+
+             const storeData = async () =>{
+             const userData = {
+              id: user.attributes.sub ,
+              fName: firstName,
+              lName: lastName,
+              username: username,
+              email: email,
+              phone: phoneNumber,
+              street: streetAddress,
+              city: city,
+              state: state,
+              zipcode: zipCode,
+              gender: gender,
+              age: 0,
+              score: 0
+            }
+            try{
+               await API.graphql({ query: mutations.createUserDetails, variables: {input: userData}});
+              console.log("use1r added to dynamo db")
+            }
+            catch(err)
+            {
+              console.log(err)
+            }
+           }
+          try{
+            storeData()
+            console.log('user stored in DB')
+
+          }
+          catch (err)
+          {
+            console.log('user not stored in DB')
+          }
           setModalVisible(!modalVisible)
           setUsername('')
           setPassword('')
@@ -88,6 +102,9 @@ const SignUp = ({navigation}) =>{
                     }
     
                 });
+              
+        
+
                  setModalVisible(true)
     
             } catch (error) {

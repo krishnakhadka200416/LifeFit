@@ -38,11 +38,12 @@ const Login = ({navigation}) => {
     async function signIn() {
         try {
             const user = await Auth.signIn(userName, password);
-            console.log(user)
+            //console.log(user)
             setUserData(user)
             try{
                 await AsyncStorage.setItem('@loginStatus', "y")
                 await AsyncStorage.setItem('@username', JSON.stringify(user))
+                console.log( await Auth.currentAuthenticatedUser() )
             }
             catch(err)
             {

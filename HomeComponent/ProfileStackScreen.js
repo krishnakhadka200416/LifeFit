@@ -17,6 +17,7 @@ const ProfileScreen = (props) => {
 
     React.useEffect (() => {
         getUserName()
+        
     }, [])
 
     const getUserName = async () =>{
