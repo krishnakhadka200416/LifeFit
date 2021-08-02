@@ -30,6 +30,10 @@ const ProfileScreen = (props) => {
             setUserName('N/A')
         }
     }
+    const signOut = async () =>{
+        await AsyncStorage.setItem('@loginStatus', 'n')
+        console.log('user is signed out')
+    }
     
     return (
         <LinearGradient
@@ -52,6 +56,7 @@ const ProfileScreen = (props) => {
                 onPress ={ ()=> {
                 
                 Auth.signOut()
+                signOut()
                 navigation.navigate('Login')
                 }}>
                     Logout

@@ -12,20 +12,45 @@ const USER_KEY = '@user_key'
 const Login = ({navigation}) => {
     const [userName, setUsername] = React.useState('');
     const [password, setPassword] = React.useState('');
-    const [isLoggedIn, setIsLoggedIn] = React.useState(false);
     const [userData, setUserData] = React.useState('')
 
+    const [isLoggedIn, setIsLoggedIn] = React.useState("n")
   
+    const isUserLoggedIn = async () =>{
+      try{
+          const userStatus = await AsyncStorage.getItem('@loginStatus')
+          console.log("Login condition is " + userStatus + isLoggedIn)
+          setIsLoggedIn(userStatus)
+      }
+      catch(err)
+      {
+        setIsLoggedIn("n")
+        console.log(err)
+      }
+    }
+  
+    React.useEffect(()=>{
+      isUserLoggedIn()
+    },[])
+
+    if (isLoggedIn === 'y') { navigation.replace('Home')}
    
     async function signIn() {
         try {
             const user = await Auth.signIn(userName, password);
             console.log(user)
             setUserData(user)
-            await AsyncStorage.setItem('@username', JSON.stringify(user))
+            try{
+                await AsyncStorage.setItem('@loginStatus', "y")
+                await AsyncStorage.setItem('@username', JSON.stringify(user))
+            }
+            catch(err)
+            {
+                console.log(err)
+            }
             setUsername('')
             setPassword('')
-            setIsLoggedIn(true)
+            
             navigation.replace('Home')
         } catch (error) {
             Alert.alert(error.message)

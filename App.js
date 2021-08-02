@@ -17,15 +17,19 @@ import { ApplicationProvider, Layout, Text } from '@ui-kitten/components';
 import NavContainer from './NavigatoinContainer/NavContainer'
 import Amplify, { Auth } from 'aws-amplify';
 import awsmobile from './src/aws-exports';
-import {withAuthenticator} from 'aws-amplify-react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
 Amplify.configure(awsmobile);
 
 
 const App = () => {
+
+
+
   return (
     
     <ApplicationProvider {...eva} theme={eva.light}>
-      <NavContainer/>
+      <NavContainer />
      </ApplicationProvider>
     
        )
