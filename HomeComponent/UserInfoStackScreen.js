@@ -8,10 +8,47 @@ import CircularProgress from 'react-native-circular-progress-indicator';
 import Foundation from "react-native-vector-icons/Foundation";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import {Auth, API} from 'aws-amplify'
+import * as queries from '../graphql/queries'
 
 const UserInfo = createStackNavigator();
 
 const HealthScore = () => {
+    const [userId, setUserId] = React.useState('')
+    const [userHealthData, setUserHealthData] = React.useState('')
+    const [score, setScore] = React.useState(0);
+
+    
+    const getUserId = async () =>{
+        await Auth.currentUserInfo().then((data) =>{
+            if(data){
+                setUserId(data.attributes.sub)
+                console.log(userId)
+            }
+        })
+    }
+    React.useEffect(()=>{
+        getUserId()
+    
+        if(userId !== "") 
+        {
+            doQuerry(userId)
+        }
+    },[userId])
+
+    async function doQuerry(userId)
+    {
+        const userDetails = await API.graphql({ query: queries.getUserDetails, variables: {id: userId}});
+        console.log(userDetails)
+        if (userDetails.data.getUserDetails) {
+             console.log(userDetails.data.getUserDetails.score);
+             setScore(userDetails.data.getUserDetails.score)
+        }       
+        else
+        {
+            console.log("Error occured while querrying for score.")
+        }
+    }
 
     return (
         <ScrollView>
@@ -42,11 +79,11 @@ const HealthScore = () => {
                 <View style = {{marginTop:20, marginLeft:20,flexDirection: "row", justifyContent:"space-between" }}>
                     <View style ={{width:80, margin:5, alignItems:"center"}}>
                         <CircularProgress
-                            value={7}
+                            value={score}
                             radius={40}
                             maxValue={10}
                             initialValue={0}
-                            activeStrokeColor = {7 > 5 ? "green" : "red"}
+                            activeStrokeColor = {score > 5 ? "green" : "red"}
                             textColor={'black'}
                             duration={1000}
                             />
