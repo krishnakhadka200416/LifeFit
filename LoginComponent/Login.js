@@ -43,7 +43,7 @@ const Login = ({navigation}) => {
             try{
                 await AsyncStorage.setItem('@loginStatus', "y")
                 await AsyncStorage.setItem('@username', JSON.stringify(user))
-                console.log( await Auth.currentAuthenticatedUser() )
+               // console.log( await Auth.currentAuthenticatedUser() )
             }
             catch(err)
             {
