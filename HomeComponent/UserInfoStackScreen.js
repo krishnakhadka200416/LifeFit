@@ -1,4 +1,4 @@
-import * as React from 'react';
+import  React , {useState, useEffect } from 'react';
 import {  View , StyleSheet, Alert, Image, TouchableOpacity, Linking, ScrollView} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -8,6 +8,7 @@ import CircularProgress from 'react-native-circular-progress-indicator';
 import Foundation from "react-native-vector-icons/Foundation";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Auth, API} from 'aws-amplify'
 import * as queries from '../graphql/queries'
 
@@ -17,13 +18,20 @@ const HealthScore = () => {
     const [userId, setUserId] = React.useState('')
     const [userHealthData, setUserHealthData] = React.useState('')
     const [score, setScore] = React.useState(0);
+    var today = new Date();
+    var yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate()-1);
+    var curr_date = yesterday.toDateString();
+    var yesterdayList = yesterday.toLocaleDateString("en-US", {year: "numeric", month: "2-digit", day: "2-digit"}).split("/");
+    var yesterdayStr = yesterdayList[2] + "-" + yesterdayList[0] + "-" + yesterdayList[1];
+    const [dateInput, setDateInput] = useState(yesterdayStr);
+    const [dateObj, setDateObj] = useState({item: yesterday});
 
-    
     const getUserId = async () =>{
         await Auth.currentUserInfo().then((data) =>{
             if(data){
                 setUserId(data.attributes.sub)
-                console.log(userId)
+                //console.log(userId)
             }
         })
     }
@@ -36,13 +44,16 @@ const HealthScore = () => {
         }
     },[userId])
 
+    
+
     async function doQuerry(userId)
     {
         const userDetails = await API.graphql({ query: queries.getUserDetails, variables: {id: userId}});
-        console.log(userDetails)
+       // console.log(userDetails)
         if (userDetails.data.getUserDetails) {
-             console.log(userDetails.data.getUserDetails.score);
+            // console.log(userDetails.data.getUserDetails.score);
              setScore(userDetails.data.getUserDetails.score)
+             
         }       
         else
         {
@@ -50,6 +61,7 @@ const HealthScore = () => {
         }
     }
 
+  
     return (
         <ScrollView>
 

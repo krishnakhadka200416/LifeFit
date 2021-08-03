@@ -5,27 +5,65 @@ import { createStackNavigator } from '@react-navigation/stack';
 import LinearGradient from 'react-native-linear-gradient'
 //import ProfileScreen from './ProfileScreen'
 import SyncScreen from './SyncScreen';
-import {Auth} from 'aws-amplify'
+import {Auth, API} from 'aws-amplify'
+import * as queries from '../graphql/queries'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AntDesign from "react-native-vector-icons/AntDesign";
 
 const Profile = createStackNavigator();
 
 const ProfileScreen = (props) => {
+    const [userId, setUserId] = React.useState('')
     const {navigation} = props; 
     const [userName, setUserName] = React.useState('')
+    const [userDetail, setUserDetail] = React.useState('')
+    
 
+    const getUserId = async () =>{
+        await Auth.currentUserInfo().then((data) =>{
+            if(data){
+                setUserId(data.attributes.sub)
+                console.log(userId)
+            }
+        })
+    }
+  
+  
     React.useEffect (() => {
+        getUserId()
         getUserName()
+        if(userId !== "") 
+        {
+            doQuerry(userId)
+        }
+       
         
-    }, [])
+    }, [userId])
+
+    async function doQuerry(userId)
+    {
+        const userDetails = await API.graphql({ query: queries.getUserDetails, variables: {id: userId}});
+       // console.log(userDetails)
+        if (userDetails.data.getUserDetails) {
+            setUserDetail(userDetails.data.getUserDetails)
+             console.log(userDetail)
+             
+        }       
+        else
+        {
+            console.log("Error occured while querrying for score.")
+        }
+    }
 
     const getUserName = async () =>{
         try {
 
             const usersName = await AsyncStorage.getItem('@username')
+            const userDetails = await AsyncStorage.getItem('@userDetail')
+            console.log(userDetails)
             
             setUserName(JSON.parse(usersName).username)
+            
         }
         catch(e){
             setUserName('N/A')
@@ -76,10 +114,10 @@ const ProfileScreen = (props) => {
 
                 <Card style={styles.card} status='danger'>
                     <Text category = "h6" style ={{marginBottom: 8}}>User Info</Text>
-                    <Text>Krishna Khadka</Text>
-                    <Text>21, M</Text>
-                    <Text>3100 E PArk Row Dr</Text>
-                    <Text>Arlington, TX, 76010</Text>
+                    <Text>{userDetail.fName} {userDetail.lName}</Text>
+                    <Text>{userDetail.age} , {userDetail.gender}</Text>
+                    <Text>{userDetail.street}</Text>
+                    <Text>{userDetail.city}, {userDetail.state}, {userDetail.zipcode}</Text>
                 </Card>
                 <Card style={styles.card} status='danger'>
                     <Text category = "h6" style ={{marginBottom: 8}}>Sync with Fitbit</Text>
