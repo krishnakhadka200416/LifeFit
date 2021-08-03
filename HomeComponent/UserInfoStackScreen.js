@@ -1,5 +1,5 @@
 import  React , {useState, useEffect } from 'react';
-import {  View , StyleSheet, Alert, Image, TouchableOpacity, Linking, ScrollView} from 'react-native';
+import {  View , StyleSheet, Alert, Image, TouchableOpacity, Linking, ScrollView, RefreshControl} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Text ,Button, Layout, Card } from '@ui-kitten/components';
@@ -16,10 +16,12 @@ const UserInfo = createStackNavigator();
 
 const HealthScore = () => {
     const [userId, setUserId] = React.useState('')
+    const [refreshing, setRefreshing] = React.useState(false);
     const [userHealthData, setUserHealthData] = React.useState('')
     const [score, setScore] = React.useState(0);
     var today = new Date();
     var yesterday = new Date(today);
+
     yesterday.setDate(yesterday.getDate()-1);
     var curr_date = yesterday.toDateString();
     var yesterdayList = yesterday.toLocaleDateString("en-US", {year: "numeric", month: "2-digit", day: "2-digit"}).split("/");
@@ -27,6 +29,15 @@ const HealthScore = () => {
     const [dateInput, setDateInput] = useState(yesterdayStr);
     const [dateObj, setDateObj] = useState({item: yesterday});
 
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        wait(1500).then(() => setRefreshing(false));
+      }, []);
+
+      const wait = (timeout) => {
+        return new Promise(resolve => setTimeout(resolve, timeout));
+      }
+      
     const getUserId = async () =>{
         await Auth.currentUserInfo().then((data) =>{
             if(data){
@@ -63,7 +74,12 @@ const HealthScore = () => {
 
   
     return (
-        <ScrollView>
+        <ScrollView 
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />}>
 
         
         <LinearGradient
