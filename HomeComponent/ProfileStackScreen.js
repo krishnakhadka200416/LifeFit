@@ -7,18 +7,71 @@ import LinearGradient from 'react-native-linear-gradient'
 import SyncScreen from './SyncScreen';
 import {Auth, API} from 'aws-amplify'
 import * as queries from '../graphql/queries'
+import * as mutations from '../graphql/mutations'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AntDesign from "react-native-vector-icons/AntDesign";
+import { authorize } from 'react-native-app-auth';
 
 const Profile = createStackNavigator();
+const config = {
+    serviceConfiguration: {
+        authorizationEndpoint: 'https://www.fitbit.com/oauth2/authorize',
+        tokenEndpoint: 'https://api.fitbit.com/oauth2/token',
+        revocationEndpoint: 'https://api.fitbit.com/oauth2/revoke'
+      },
+     clientSecret: 'aea53919e7de0f0ded7e30ea9fa2180b',
+    clientId: '22C2J2',
+    redirectUrl: 'com.lifefitapp://fitbit',
+    scopes: ['heartrate', 'activity', 'activity' , 'profile' , 'sleep'],
+  };
 
 const ProfileScreen = (props) => {
     const [userId, setUserId] = React.useState('')
     const {navigation} = props; 
     const [userName, setUserName] = React.useState('')
     const [userDetail, setUserDetail] = React.useState('')
-    
+    const [fitBitResponse, setFitBitResponse] = React.useState({})
+    const [syncStatus, setSyncStatus] = React.useState(0)
 
+    const  OAuth = async () => {
+        try {
+            const result = await authorize(config);
+            const newToken  = {
+                id: userId,
+                access_token: result.accessToken,
+                refresh_token: result.refreshToken,
+                user_id: result.tokenAdditionalParameters.user_id,
+                expires_in: 28800
+
+            }
+            //console.log(newToken)
+            setSyncStatus(1)
+            try {
+                await AsyncStorage.setItem('@fitBitAuth', JSON.stringify(result))
+
+            }
+            catch (err)
+            {
+                console.log("Couldn't save fitbit auth")
+            }
+            try
+            {
+                await API.graphql({ query: mutations.createFitbitTokens, variables: {input: newToken}});
+                console.log("User fitbit added to AWS")
+            }
+            catch(err)
+            {
+                console.log(err)
+            }
+            setFitBitResponse(result)
+            //console.log( result)
+
+            // result includes accessToken, accessTokenExpirationDate and refreshToken
+          } catch (error) {
+            console.log("The error is " + error);
+          }
+        }
+    
     const getUserId = async () =>{
         await Auth.currentUserInfo().then((data) =>{
             if(data){
@@ -83,7 +136,6 @@ const ProfileScreen = (props) => {
         >
             <View style = {styles.container1}>
                 <View style = {{marginLeft: 10, flexDirection: 'row', marginTop:8}}>
-               
                     <Text style ={{marginLeft:7, color: "white"}} category ="h4" >
                          Profile
                     </Text>
@@ -93,7 +145,6 @@ const ProfileScreen = (props) => {
                 status = "control"
                 style = {{height:50}}
                 onPress ={ ()=> {
-                
                 Auth.signOut()
                 signOut()
                 navigation.navigate('Login')
@@ -123,12 +174,15 @@ const ProfileScreen = (props) => {
                     <Text category = "h6" style ={{marginBottom: 8}}>Sync with Fitbit</Text>
                     <View flexDirection="row">
                         <Text category = "p1">Status: </Text>
-                        <Text category = "p1">  Not Synced </Text>
+                       {syncStatus === 0 ? <Text category = "p1">  Not Synced </Text> : <Text category = "p1">  Synced </Text> }
+                        
                     </View>
                     <View style = {{marginHorizontal: 90, marginTop: 20}}>
                         <Button 
                             appearance = "outline"
-                            status = "danger" >
+                            status = "danger"
+                            onPress = {()=>OAuth()}
+                          >
                             Sync Now
                         </Button>
                     </View>
