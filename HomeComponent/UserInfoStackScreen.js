@@ -13,6 +13,11 @@ import {Auth, API} from 'aws-amplify'
 import { authorize } from 'react-native-app-auth';
 import {config} from './config'
 import * as queries from '../graphql/queries'
+import {
+    BarChart,
+    LineChart,
+   
+  } from "react-native-chart-kit";
 
 const UserInfo = createStackNavigator();
 
@@ -23,15 +28,24 @@ const HealthScore = () => {
     const [refreshing, setRefreshing] = React.useState(false);
     const [userHealthData, setUserHealthData] = React.useState('')
     const [score, setScore] = React.useState(0);
-    var today = new Date();
-    var yesterday = new Date(today);
-    console.log(JSON.stringify(config) + "the val")
-    yesterday.setDate(yesterday.getDate()-1);
-    var curr_date = yesterday.toDateString();
-    var yesterdayList = yesterday.toLocaleDateString("en-US", {year: "numeric", month: "2-digit", day: "2-digit"}).split("/");
-    var yesterdayStr = yesterdayList[2] + "-" + yesterdayList[0] + "-" + yesterdayList[1];
-    const [dateInput, setDateInput] = useState(yesterdayStr);
-    const [dateObj, setDateObj] = useState({item: yesterday});
+    const [calories, setCalories] = React.useState(0);
+    const [miles, setMiles] = React.useState(0);
+    const [steps, setSteps] = React.useState(0);
+    const [heart, setHeart] = React.useState(0);
+    const [mActive, setMactive] = React.useState(0);
+    const [sActive, setSactive] = React.useState(0);
+    const [vActive, setVactive] = React.useState(0);
+    const [heartrateTime, setHeartRateTime] = React.useState([]);
+    const [heartrateValue, setHeartRateValue] = React.useState([0,0,0,0,0,0,0,0,0,0,0,0]);
+    const [totalheartrate, setTotalHeartRate] = React.useState(0);
+    const [sleepHr, setSleepHr] = React.useState(0);
+    var now = new Date();
+    var day = ("0" + now.getDate()).slice(-2);
+    var month = ("0" + (now.getMonth() + 1)).slice(-2);
+    var today = now.getFullYear() + "-" + (month) + "-" + (day);
+    
+    console.log(today);
+  
 
     const onRefresh = React.useCallback(() => {
         setRefreshing(true);
@@ -66,8 +80,11 @@ const HealthScore = () => {
         try 
         {
             const userInfoFitBit = await AsyncStorage.getItem('@fitBitAuth')
+            
             console.log(JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id)
-            const ApiUrl = `https://api.fitbit.com/1/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/activities/date/2021-07-23.json`
+            const ApiUrl = `https://api.fitbit.com/1/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/activities/date/2021-07-25.json`
+            const heartUrl = `https://api.fitbit.com/1/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/activities/heart/date/2021-07-25/1d/1min/time/00:00/23:59.json`
+            const sleepUrl = `https://api.fitbit.com/1.2/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/sleep/date/2021-07-25.json`
             try{
 
                 const userHealthActivity = await fetch(ApiUrl, {
@@ -78,7 +95,13 @@ const HealthScore = () => {
                     }
                 }).then(res => res.json())
                 .then(res => {
-                    console.log(res.goals)
+                   // console.log(res.summary.lightlyActiveMinutes)
+                    setMiles(res.summary.distances[0].distance)
+                    setCalories(res.summary.caloriesOut)
+                    setSteps(res.summary.steps)
+                    setMactive(res.summary.lightlyActiveMinutes)
+                    setVactive(res.summary.veryActiveMinutes)
+                    setSactive(res.summary.sedentaryMinutes)     
                     AsyncStorage.setItem('@userFitBitHealth', JSON.stringify(res))
                 }).
                 catch(err=> {
@@ -88,8 +111,94 @@ const HealthScore = () => {
             }
             catch(err)
             {
-
+                console.log(err)
                
+            }
+            try{
+
+                const userHeartActivity = await fetch(heartUrl, {
+                    method: 'GET',
+                    headers:{
+                        Authorization: `Bearer ${JSON.parse(userInfoFitBit).accessToken}` ,
+    
+                    }
+                }).then(res => res.json())
+                .then(res => {
+                    //console.log(res.["activities-heart-intraday"].dataset)
+                    var timelist = [];
+                    var heartratelist = [];
+                    var list = res.["activities-heart-intraday"].dataset.length
+                    var time = 0;
+                    //console.log(list)
+                    for (var i = 0; i< list; i= i + 115)
+                    {
+                        var counter =  res.["activities-heart-intraday"].dataset[i]
+                        var time = time + 2
+                        var hrate = counter.value
+                        timelist.push(time)
+                        heartratelist.push(hrate)
+
+                    }
+                    //console.log(timelist)
+                    setHeartRateTime(timelist)
+                    //console.log(heartratelist )
+                    setHeartRateValue(heartratelist)
+
+
+                  
+                    setHeart(res.["activities-heart"][0].value)
+
+                    
+                    //AsyncStorage.setItem('@userFitBitHealth', JSON.stringify(res))
+                }).
+                catch(err=> {
+                   console.log(err)
+                })
+                //console.log(JSON.stringify(userHealthActivity))
+            }
+            catch(err)
+            {
+                console.log(err)
+               
+            }
+
+            try{
+                const userSleepActivity = await fetch(sleepUrl, {
+                    method: 'GET',
+                    headers:{
+                        Authorization: `Bearer ${JSON.parse(userInfoFitBit).accessToken}` ,
+    
+                    }
+                }).then(res => res.json())
+                .then(res => {
+                    console.log(res.sleep[0].levels.data[0].level)
+                    var sleepData = res.sleep[0].levels.data
+                    var light = 0
+                    var deep = 0
+                    var rem = 0
+                    var awake = 0
+
+                    for (var i = 0; i< sleepData.length; i++)
+                    {
+                        var counter =  res.["activities-heart-intraday"].dataset[i]
+                        var time = time + 2
+                        var hrate = counter.value
+                        timelist.push(time)
+                        heartratelist.push(hrate)
+
+                    }
+
+                    setSleepHr(res.summary.totalMinutesAsleep)
+                   
+                }).
+                catch(err=> {
+                    Alert.alert("Please sync with fitbit in the profile page")
+                })
+
+            }
+            catch(err)
+            {
+                console.log(err)
             }
             
          }
@@ -129,7 +238,7 @@ const HealthScore = () => {
         colors={['red', 'white']}
         style={styles.container}
         start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 0.20 }}
+        end={{ x: 0, y: 0.12 }}
         >
             <View style = {styles.container1}>
                
@@ -186,11 +295,11 @@ const HealthScore = () => {
                         <TouchableOpacity>
 
                             <CircularProgress
-                                value={1500}
+                                value={steps}
                                 radius={35}
                                 maxValue={10000}
                                 initialValue={0}
-                                activeStrokeColor =  {1500 > 5000 ? "green" : "red"}
+                                activeStrokeColor =  {steps > 5000 ? "green" : "red"}
                                 textColor={'black'}
                                 duration={1000}
                                 />
@@ -204,11 +313,11 @@ const HealthScore = () => {
                         <View style ={{width:70, margin:5, alignItems:"center"}}>
                         <TouchableOpacity>
                             <CircularProgress
-                                value={3}
+                                value={((miles/1.6)-miles)>0.5 ? math.ceil(miles/1.6) : (miles/1.6)}
                                 radius={35}
                                 maxValue={5}
                                 initialValue={0}
-                                activeStrokeColor = {3 > 2.5 ? "green" : "red"}
+                                activeStrokeColor = {miles > 2.5 ? "green" : "red"}
                                 textColor={'black'}
                                 duration={1000}
                                 />
@@ -224,11 +333,11 @@ const HealthScore = () => {
                         <View style ={{width:70, margin:5, alignItems:"center"}}>
                         <TouchableOpacity>
                             <CircularProgress
-                                value={800}
+                                value={calories}
                                 radius={35}
-                                maxValue={2000}
+                                maxValue={3000}
                                 initialValue={0}
-                                activeStrokeColor = {  800 > 1000 ? "green" : "red" }
+                                activeStrokeColor = {  calories > 1500 ? "green" : "red" }
                                                                      
                                     
                                     
@@ -247,16 +356,89 @@ const HealthScore = () => {
                     
                 </Card>
                 <Card style={styles.card} status='danger'>
-                    <Text category = "h6" style ={{marginBottom: 8}}>Heart Rate</Text>          
+                    <View style = {{flexDirection: "row", justifyContent:"space-between"}}>
+                    <Text category = "h6" style ={{marginBottom: 8}}>Heart </Text>          
+                    <Text category = "h6" style ={{marginBottom: 8, color: "red"}}>{Math.floor(heart)} bpm</Text>          
+                        
+                    </View>
+                    <LineChart
+                    data={{
+                    labels: ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22"],
+                    datasets: [
+                        {
+                        data:heartrateValue,
+                        }
+                    ]
+                    }}
+                    width={335} // from react-native
+                    height={230}
+                    
+                    yAxisInterval={1} // optional, defaults to 1
+                    chartConfig={{
+                    backgroundColor: "red",
+                    backgroundGradientFrom: "red",
+                    backgroundGradientTo: "#ffa726",
+                    decimalPlaces: 2, // optional, defaults to 2dp
+                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                  
+                    }}
+                    bezier
+                    style={{
+                    marginVertical: 6,
+                    borderRadius: 10
+                    }}
+                />
 
                 </Card>
                 <Card style={styles.card} status='danger'>
-                    <Text category = "h6" style ={{marginBottom: 8}}> Sleep </Text>          
+                <View style = {{flexDirection: "row", justifyContent:"space-between"}}>
+                    <Text category = "h6" style ={{marginBottom: 8}}>Sleep </Text>          
+                    <Text category = "h6" style ={{marginBottom: 8, color: "red"}}>
+                    {Math.floor(sleepHr/60)} hr { Math.floor(((sleepHr/60)- Math.floor(sleepHr/60)) * 60)} min
+                   </Text>          
+                        
+                </View>
 
                 </Card>
                 
-                <Card style={styles.card} status='danger' onPress = {()=> {Alert.alert("Pressed")}}>
+                <Card style={styles.card} status='danger'>
+                <View style = {{flexDirection: "row", justifyContent:"space-between"}}>
                     <Text category = "h6" style ={{marginBottom: 8}}>Active</Text>          
+                    <Text category = "h6" style ={{marginBottom: 8, color: "red"}}>
+                    {Math.floor((sActive+mActive+vActive)/60)} hr { Math.floor((((sActive+mActive+vActive)/60)- Math.floor((sActive+mActive+vActive)/60)) * 60)} min
+                   </Text>          
+                        
+                </View>         
+                    <BarChart
+                        data = {{
+                            labels: ["Inactive", "Moderate", "Active"],
+                            datasets: [
+                                {
+                                   data:[(sActive/60).toFixed(1), (mActive/60).toFixed(1), (vActive/60).toFixed(1)]
+                                }
+                                ]
+                        }}
+                        width = {335}
+                        showValuesOnTopOfBars
+                        height = {230}
+                        chartConfig={{
+                            backgroundColor: "red",
+                            backgroundGradientFrom: "red",
+                            backgroundGradientFromOpacity:1,
+                            fillShadowGradientOpacity:1,
+                            fillShadowGradient:"white",
+                            
+                            backgroundGradientTo: "#ffa726",  
+                            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+                        }}
+                        showBarTops
+                        bezier
+                    style={{
+                    marginVertical: 6,
+                    borderRadius: 10
+                    }}
+                        
+                    />         
                 </Card>
             </View>
             </LinearGradient>

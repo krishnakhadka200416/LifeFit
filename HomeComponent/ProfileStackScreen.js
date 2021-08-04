@@ -37,7 +37,7 @@ const ProfileScreen = (props) => {
         try {
             const result = await authorize(config);
           
-            //console.log(newToken)
+           console.log(result)
             setSyncStatus(1)
             try {
                 await AsyncStorage.setItem('@fitBitAuth', JSON.stringify(result))
@@ -75,7 +75,7 @@ const ProfileScreen = (props) => {
         await Auth.currentUserInfo().then((data) =>{
             if(data){
                 setUserId(data.attributes.sub)
-                console.log(userId)
+               // console.log(userId)
             }
         })
     }

@@ -25,6 +25,7 @@
     "react": "17.0.1",
     "react-native": "0.64.2",
     "react-native-app-auth": "^6.4.0",
+    "react-native-chart-kit": "^6.11.0",
     "react-native-circular-progress-indicator": "^1.1.1",
     "react-native-date-picker": "^3.3.2",
     "react-native-gesture-handler": "^1.10.3",
