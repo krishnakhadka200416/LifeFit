@@ -36,14 +36,7 @@ const ProfileScreen = (props) => {
     const  OAuth = async () => {
         try {
             const result = await authorize(config);
-            const newToken  = {
-                id: userId,
-                access_token: result.accessToken,
-                refresh_token: result.refreshToken,
-                user_id: result.tokenAdditionalParameters.user_id,
-                expires_in: 28800
-
-            }
+          
             //console.log(newToken)
             setSyncStatus(1)
             try {
@@ -56,7 +49,13 @@ const ProfileScreen = (props) => {
             }
             try
             {
-                await API.graphql({ query: mutations.createFitbitTokens, variables: {input: newToken}});
+                await API.graphql({ query: mutations.createFitbitTokens, variables: {input: {
+                    id: userId,
+                    access_token: result.accessToken,
+                    refresh_token: result.refreshToken,
+                    user_id: result.tokenAdditionalParameters.user_id,
+                    expires_in: 28800
+                }}});
                 console.log("User fitbit added to AWS")
             }
             catch(err)

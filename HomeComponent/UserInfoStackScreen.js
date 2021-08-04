@@ -10,9 +10,13 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {Auth, API} from 'aws-amplify'
+import { authorize } from 'react-native-app-auth';
+import {config} from './config'
 import * as queries from '../graphql/queries'
 
 const UserInfo = createStackNavigator();
+
+
 
 const HealthScore = () => {
     const [userId, setUserId] = React.useState('')
@@ -21,7 +25,7 @@ const HealthScore = () => {
     const [score, setScore] = React.useState(0);
     var today = new Date();
     var yesterday = new Date(today);
-
+    console.log(JSON.stringify(config) + "the val")
     yesterday.setDate(yesterday.getDate()-1);
     var curr_date = yesterday.toDateString();
     var yesterdayList = yesterday.toLocaleDateString("en-US", {year: "numeric", month: "2-digit", day: "2-digit"}).split("/");
@@ -48,14 +52,53 @@ const HealthScore = () => {
     }
     React.useEffect(()=>{
         getUserId()
+
+        getUserActivity()
     
         if(userId !== "") 
         {
             doQuerry(userId)
         }
-    },[userId])
+    },[refreshing, userId])
 
+    const getUserActivity = async () =>
+    {
+        try 
+        {
+            const userInfoFitBit = await AsyncStorage.getItem('@fitBitAuth')
+            console.log(JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id)
+            const ApiUrl = `https://api.fitbit.com/1/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/activities/date/2021-07-23.json`
+            try{
+
+                const userHealthActivity = await fetch(ApiUrl, {
+                    method: 'GET',
+                    headers:{
+                        Authorization: `Bearer ${JSON.parse(userInfoFitBit).accessToken}` ,
     
+                    }
+                }).then(res => res.json())
+                .then(res => {
+                    console.log(res.goals)
+                    AsyncStorage.setItem('@userFitBitHealth', JSON.stringify(res))
+                }).
+                catch(err=> {
+                    Alert.alert("Please sync with fitbit in the profile page")
+                })
+                //console.log(JSON.stringify(userHealthActivity))
+            }
+            catch(err)
+            {
+
+               
+            }
+            
+         }
+        catch (err)
+        { 
+            Alert.alert("Please sync with fitbit in the profile page")
+            console.log("Couldn't fetch fitbit API")
+        }
+    }
 
     async function doQuerry(userId)
     {
@@ -100,7 +143,12 @@ const HealthScore = () => {
                     <Button 
                     appearance = "outline"
                     status = "control"
-                    style = {{height:50}}>
+                    style = {{height:50}}
+                    onPress = { () => {
+                        setRefreshing(true);
+                        wait(1500).then(() => setRefreshing(false));
+                    } }
+                    >
                         Sync
                     </Button>
                 </View>
