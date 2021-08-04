@@ -16,6 +16,7 @@ import * as queries from '../graphql/queries'
 import {
     BarChart,
     LineChart,
+    PieChart,
    
   } from "react-native-chart-kit";
 
@@ -39,6 +40,11 @@ const HealthScore = () => {
     const [heartrateValue, setHeartRateValue] = React.useState([0,0,0,0,0,0,0,0,0,0,0,0]);
     const [totalheartrate, setTotalHeartRate] = React.useState(0);
     const [sleepHr, setSleepHr] = React.useState(0);
+    const [light, setLight] = React.useState(0);
+    const [deep, setDeep] = React.useState(0);
+    const [rem, setRem] = React.useState(0);
+    const [awake, setAwake] = React.useState(0);
+
     var now = new Date();
     var day = ("0" + now.getDate()).slice(-2);
     var month = ("0" + (now.getMonth() + 1)).slice(-2);
@@ -180,14 +186,29 @@ const HealthScore = () => {
 
                     for (var i = 0; i< sleepData.length; i++)
                     {
-                        var counter =  res.["activities-heart-intraday"].dataset[i]
-                        var time = time + 2
-                        var hrate = counter.value
-                        timelist.push(time)
-                        heartratelist.push(hrate)
+                         if(sleepData[i].level === "light")
+                         {
+                            light = light + sleepData[i].seconds
+                         }
+                         else if(sleepData[i].level === "deep")
+                         {
+                            deep = deep + sleepData[i].seconds
+                         }
+                         else if(sleepData[i].level === "rem")
+                         {
+                            rem = rem + sleepData[i].seconds
+                         }
+                         else
+                         {
+                             awake = awake + sleepData[i].seconds
+                         }
 
                     }
-
+                   // console.log("light : " + light/60 + " deep: " + deep/60 + " rem: " + rem/60 + " awake: " + awake/60  )
+                    setLight(light/60)
+                    setDeep(deep/60)
+                    setRem(rem/60)
+                    setAwake(awake/60)
                     setSleepHr(res.summary.totalMinutesAsleep)
                    
                 }).
@@ -391,13 +412,66 @@ const HealthScore = () => {
 
                 </Card>
                 <Card style={styles.card} status='danger'>
-                <View style = {{flexDirection: "row", justifyContent:"space-between"}}>
-                    <Text category = "h6" style ={{marginBottom: 8}}>Sleep </Text>          
-                    <Text category = "h6" style ={{marginBottom: 8, color: "red"}}>
-                    {Math.floor(sleepHr/60)} hr { Math.floor(((sleepHr/60)- Math.floor(sleepHr/60)) * 60)} min
-                   </Text>          
+                    <View style = {{flexDirection: "row", justifyContent:"space-between"}}>
+                        <Text category = "h6" style ={{marginBottom: 8}}>Sleep </Text>          
+                        <Text category = "h6" style ={{marginBottom: 8, color: "red"}}>
+                        {Math.floor(sleepHr/60)} hr { Math.floor(((sleepHr/60)- Math.floor(sleepHr/60)) * 60)} min
+                    </Text>          
+                            
+                    </View>
+                    <PieChart
+                        data = {[
+                            {
+                                name: "Light",
+                                population: light/60,
+                                color: "rgba(131, 167, 234, 1)",
+                                legendFontColor: "#7F7F7F",
+                                legendFontSize: 15
+                            },
+                            {
+                                name: "Deep",
+                                population: deep/60,
+                                color: "#F00",
+                                legendFontColor: "#7F7F7F",
+                                legendFontSize: 15
+                            },
+                            {
+                                name: "Rem",
+                                population: Math.ceil(rem/60),
+                                color: "green",
+                                legendFontColor: "#7F7F7F",
+                                legendFontSize: 15
+                            },
+                            {
+                                name: "Awake",
+                                population: awake/60,
+                                color: "orange",
+                                legendFontColor: "#7F7F7F",
+                                legendFontSize: 15
+                            },
+
+
+                        ]}
+                        width ={350}
+                        height= {200}
+                        chartConfig={{
+                            backgroundColor: "red",
+                            backgroundGradientFrom: "red",
+                            backgroundGradientTo: "#ffa726",
+                            decimalPlaces: 2, // optional, defaults to 2dp
+                            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                         
-                </View>
+                            }}
+                        accessor = {"population"}
+                        backgroundColor={"transparent"}
+                        
+    
+                        absolute
+
+                    
+                    >
+
+                    </PieChart>
 
                 </Card>
                 
