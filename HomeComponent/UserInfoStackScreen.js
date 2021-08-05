@@ -1,5 +1,5 @@
 import  React , {useState, useEffect } from 'react';
-import {  View , StyleSheet, Alert, Image, TouchableOpacity, Linking, ScrollView, RefreshControl} from 'react-native';
+import {  View , StyleSheet, Alert, Image, TouchableOpacity, Linking, ScrollView, RefreshControl, Modal} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Text ,Button, Layout, Card } from '@ui-kitten/components';
@@ -13,6 +13,10 @@ import {Auth, API} from 'aws-amplify'
 import { authorize } from 'react-native-app-auth';
 import {config} from './config'
 import * as queries from '../graphql/queries'
+import AntDesign from "react-native-vector-icons/AntDesign";
+import DatePicker from 'react-native-date-picker'
+import date from 'date-and-time';
+
 import {
     BarChart,
     LineChart,
@@ -44,13 +48,14 @@ const HealthScore = () => {
     const [deep, setDeep] = React.useState(0);
     const [rem, setRem] = React.useState(0);
     const [awake, setAwake] = React.useState(0);
-
-    var now = new Date();
-    var day = ("0" + now.getDate()).slice(-2);
-    var month = ("0" + (now.getMonth() + 1)).slice(-2);
-    var today = now.getFullYear() + "-" + (month) + "-" + (day);
-    
-    console.log(today);
+    const [modalVisible, setModalVisible] = useState(false);
+    var selectedDate = 0
+    // var now = new Date();
+    // var day = ("0" + now.getDate()).slice(-2);
+    // var month = ("0" + (now.getMonth() + 1)).slice(-2);
+    // var today = now.getFullYear() + "-" + (month) + "-" + (day);
+    //console.log(today);
+    const [dataDate, setDataDate] = React.useState(date.format(new Date(), 'YYYY-MM-DD'));
   
 
     const onRefresh = React.useCallback(() => {
@@ -79,7 +84,7 @@ const HealthScore = () => {
         {
             doQuerry(userId)
         }
-    },[refreshing, userId])
+    },[refreshing, userId, dataDate])
 
     const getUserActivity = async () =>
     {
@@ -87,10 +92,11 @@ const HealthScore = () => {
         {
             const userInfoFitBit = await AsyncStorage.getItem('@fitBitAuth')
             
-            console.log(JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id)
-            const ApiUrl = `https://api.fitbit.com/1/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/activities/date/2021-07-25.json`
-            const heartUrl = `https://api.fitbit.com/1/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/activities/heart/date/2021-07-25/1d/1min/time/00:00/23:59.json`
-            const sleepUrl = `https://api.fitbit.com/1.2/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/sleep/date/2021-07-25.json`
+            
+            
+            const ApiUrl = `https://api.fitbit.com/1/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/activities/date/${dataDate}.json`
+            const heartUrl = `https://api.fitbit.com/1/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/activities/heart/date/${dataDate}/1d/1min/time/00:00/23:59.json`
+            const sleepUrl = `https://api.fitbit.com/1.2/user/${JSON.parse(userInfoFitBit).tokenAdditionalParameters.user_id}/sleep/date/${dataDate}.json`
             try{
 
                 const userHealthActivity = await fetch(ApiUrl, {
@@ -177,7 +183,8 @@ const HealthScore = () => {
                     }
                 }).then(res => res.json())
                 .then(res => {
-                    console.log(res.sleep[0].levels.data[0].level)
+                   
+                    console.log(res.sleep)
                     var sleepData = res.sleep[0].levels.data
                     var light = 0
                     var deep = 0
@@ -210,10 +217,12 @@ const HealthScore = () => {
                     setRem(rem/60)
                     setAwake(awake/60)
                     setSleepHr(res.summary.totalMinutesAsleep)
+
+
                    
                 }).
                 catch(err=> {
-                    Alert.alert("Please sync with fitbit in the profile page")
+                    console.log(err)
                 })
 
             }
@@ -226,7 +235,7 @@ const HealthScore = () => {
         catch (err)
         { 
             Alert.alert("Please sync with fitbit in the profile page")
-            console.log("Couldn't fetch fitbit API")
+            console.log(err)
         }
     }
 
@@ -255,12 +264,14 @@ const HealthScore = () => {
           />}>
 
         
+        
         <LinearGradient
         colors={['red', 'white']}
         style={styles.container}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 0.12 }}
         >
+       
             <View style = {styles.container1}>
                
 
@@ -308,9 +319,55 @@ const HealthScore = () => {
                 
 
             </View>
+            <Modal
+                animationType="slide"
+                transparent = {true}
+                
+                visible={modalVisible}
+                onRequestClose={() => {
+                Alert.alert("Modal has been closed.");
+                setModalVisible(!modalVisible);
+                }}
+            >
+                <View style = {{flex:1, alignItems:"center", justifyContent:"space-around", backgroundColor:"white", }}>
+                    <Text category = "h3">Select Date</Text>
+                            <DatePicker
+                              mode = 'date'
+                                date ={ new Date()}
+                                onDateChange = {(resp) => 
+                                {
+                                    selectedDate = resp
+                                    console.log(resp)
+                                }
+
+                                }
+
+                            ></DatePicker>
+
+                    <Button onPress={()=>
+                    {
+
+                        setDataDate(date.format(selectedDate, 'YYYY-MM-DD'))
+                        setModalVisible(!modalVisible)
+                    }
+                    }
+                    >Done</Button>
+
+
+
+                </View>
+
+            </Modal>
             <View style = {styles.container2}>
                 <Card style={styles.card} status='danger'>
-                    <Text category = "h6" style ={{marginBottom: 8}}>Today</Text>
+                        <View style = {{flexDirection:"row", justifyContent:"space-between", marginBottom: 5}}>
+                             <Text category = "h6" style ={{marginBottom: 8}}>{dataDate}</Text>
+                            <TouchableOpacity onPress= {()=>setModalVisible(true)}>
+                                <AntDesign name="calendar" color= "red" size={25} />
+                            </TouchableOpacity>
+
+                        </View>
+
                     <View style = {{flexDirection:"row", justifyContent:"space-between"}}>
                         <View style ={{width:70, margin:5, alignItems:"center"}}>
                         <TouchableOpacity>
