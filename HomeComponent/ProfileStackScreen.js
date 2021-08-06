@@ -37,7 +37,7 @@ const ProfileScreen = (props) => {
         try {
             const result = await authorize(config);
           
-           console.log(result)
+           //console.log(result)
             setSyncStatus(1)
             try {
                 await AsyncStorage.setItem('@fitBitAuth', JSON.stringify(result))
@@ -49,6 +49,7 @@ const ProfileScreen = (props) => {
             }
             try
             {
+                
                 await API.graphql({ query: mutations.createFitbitTokens, variables: {input: {
                     id: userId,
                     access_token: result.accessToken,
@@ -60,14 +61,26 @@ const ProfileScreen = (props) => {
             }
             catch(err)
             {
+
+                console.log( result.accessToken)
+                await API.graphql({ query: mutations.deleteFitbitTokens, 
+                    variables: 
+                {  
+                    input:
+                    {
+                        id: userId,
+                    },
+                    _version: "10"
+            
+                }});
+                console.log("User fitbit updated to AWS")                
                 console.log(err)
             }
             setFitBitResponse(result)
-            //console.log( result)
-
-            // result includes accessToken, accessTokenExpirationDate and refreshToken
+    
           } catch (error) {
-            console.log("The error is " + error);
+           
+            console.log(error);
           }
         }
     
@@ -123,6 +136,7 @@ const ProfileScreen = (props) => {
     }
     const signOut = async () =>{
         await AsyncStorage.setItem('@loginStatus', 'n')
+        await AsyncStorage.removeItem('@fitBitAuth')
         console.log('user is signed out')
     }
     

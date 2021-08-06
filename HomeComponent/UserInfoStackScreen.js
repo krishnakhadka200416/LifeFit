@@ -40,7 +40,7 @@ const HealthScore = () => {
     const [mActive, setMactive] = React.useState(0);
     const [sActive, setSactive] = React.useState(0);
     const [vActive, setVactive] = React.useState(0);
-    const [heartrateTime, setHeartRateTime] = React.useState([]);
+    const [heartrateTime, setHeartRateTime] = React.useState(["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22"]);
     const [heartrateValue, setHeartRateValue] = React.useState([0,0,0,0,0,0,0,0,0,0,0,0]);
     const [totalheartrate, setTotalHeartRate] = React.useState(0);
     const [sleepHr, setSleepHr] = React.useState(0);
@@ -140,18 +140,18 @@ const HealthScore = () => {
                     var timelist = [];
                     var heartratelist = [];
                     var list = res.["activities-heart-intraday"].dataset.length
-                    var time = 0;
+                    var time = -2;
                     //console.log(list)
                     for (var i = 0; i< list; i= i + 115)
                     {
                         var counter =  res.["activities-heart-intraday"].dataset[i]
-                        var time = time + 2
+                        time = time + 2
                         var hrate = counter.value
                         timelist.push(time)
                         heartratelist.push(hrate)
 
                     }
-                    //console.log(timelist)
+                    console.log(timelist)
                     setHeartRateTime(timelist)
                     //console.log(heartratelist )
                     setHeartRateValue(heartratelist)
@@ -212,10 +212,11 @@ const HealthScore = () => {
 
                     }
                    // console.log("light : " + light/60 + " deep: " + deep/60 + " rem: " + rem/60 + " awake: " + awake/60  )
-                    setLight(light/60)
-                    setDeep(deep/60)
-                    setRem(rem/60)
-                    setAwake(awake/60)
+                   console.log (parseFloat((light/3600).toPrecision(2)))
+                   setLight(parseFloat((light/3600).toFixed(2)))
+                    setDeep(parseFloat((deep/3600).toFixed(2)))
+                    setRem(parseFloat((rem/3600).toFixed(2)))
+                    setAwake(parseFloat((awake/3600).toFixed(2)))
                     setSleepHr(res.summary.totalMinutesAsleep)
 
 
@@ -441,7 +442,7 @@ const HealthScore = () => {
                     </View>
                     <LineChart
                     data={{
-                    labels: ["0", "2", "4", "6", "8", "10", "12", "14", "16", "18", "20", "22"],
+                    labels: heartrateTime,
                     datasets: [
                         {
                         data:heartrateValue,
@@ -480,28 +481,28 @@ const HealthScore = () => {
                         data = {[
                             {
                                 name: "Light",
-                                population: light/60,
+                                population: (light),
                                 color: "rgba(131, 167, 234, 1)",
                                 legendFontColor: "#7F7F7F",
                                 legendFontSize: 15
                             },
                             {
                                 name: "Deep",
-                                population: deep/60,
+                                population: (deep),
                                 color: "#F00",
                                 legendFontColor: "#7F7F7F",
                                 legendFontSize: 15
                             },
                             {
                                 name: "Rem",
-                                population: Math.ceil(rem/60),
+                                population: (rem),
                                 color: "green",
                                 legendFontColor: "#7F7F7F",
                                 legendFontSize: 15
                             },
                             {
                                 name: "Awake",
-                                population: awake/60,
+                                population: (awake),
                                 color: "orange",
                                 legendFontColor: "#7F7F7F",
                                 legendFontSize: 15
